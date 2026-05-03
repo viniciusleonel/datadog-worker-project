@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: datadog-project
+    depends_on:
+      localstack:
+        condition: service_healthy
+      datadog-agent:
+        condition: service_started
+    environment:
+      - DD_SERVICE=datadog-worker
+      - DD_ENV=dev
+      - DD_VERSION=1.0
+      - DD_LOGS_INJECTION=true
+      - DD_AGENT_HOST=datadog-agent
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+    labels:
+      - "com.datadoghq.ad.logs=[{\"source\":\"java\",\"service\":\"datadog-worker\"}]"
+    ports:
+      - "8080:8080"
+
+  datadog-agent:
+    image: registry.datadoghq.com/agent:7
+    container_name: dd-agent
+    environment:
+      - DD_API_KEY=e8566cc55208877baf7006f9abaed8b7
+      - DD_SITE=datadoghq.com
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=false
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    ports:
+      - "8126:8126"
+
+  localstack:
+    image: localstack/localstack:3
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=us-east-1
+      - LS_LOG=info
+    volumes:
+      - ./localstack/init:/etc/localstack/init/ready.d
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4566/_localstack/health" ]
+      interval: 5s
+      timeout: 2s
+      retries: 10
