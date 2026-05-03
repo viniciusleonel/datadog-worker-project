@@ -157,12 +157,28 @@ echo "✅ Permissões configuradas"
 # =========================
 # 🔁 Loop de envio
 # =========================
+
+echo "🔁 Iniciando envio de mensagens..."
+
 while true; do
-  echo "📨 Enviando mensagem..."
+  echo "📦 Enviando lote de mensagens..."
+
+  # 5 mensagens válidas
+  for i in {1..5}; do
+    echo "✅ Enviando mensagem válida $i"
+
+    awslocal sns publish \
+      --topic-arn $TOPIC_ARN \
+      --message "{\"event\":\"order_created\",\"status\":\"OK\",\"timestamp\":\"$(date)\"}"
+  done
+
+  # 1 mensagem com erro
+  echo "❌ Enviando mensagem com ERRO"
 
   awslocal sns publish \
     --topic-arn $TOPIC_ARN \
-    --message "{\"event\":\"order_created\",\"timestamp\":\"$(date)\"}"
+    --message "{\"event\":\"order_created\",\"status\":\"ERROR\",\"timestamp\":\"$(date)\"}"
 
-  sleep 60
+  echo "⏳ Aguardando 15 segundos..."
+  sleep 15
 done

@@ -33,6 +33,10 @@ public class WorkerListener2 {
             log.atInfo()
                     .log("Mensagem recebida - event_type={} raw_message={}", eventType, message);
 
+            if (message.contains("ERROR")) {
+                throw new QueueProcessingException("Erro simulado");
+            }
+
         } catch (Exception e) {
             log.atError()
                     .log("Erro ao processar mensagem - raw_message={}", message);
