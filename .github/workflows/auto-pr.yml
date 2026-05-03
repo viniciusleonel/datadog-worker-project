@@ -1,0 +1,44 @@
+name: Auto PR Feature → Develop
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Criar ou atualizar Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          base: develop
+
+          title: "[AUTO] ${{ github.ref_name }} → develop"
+          body: |
+            Este PR foi criado **automaticamente** pelo GitHub Actions.
+
+            **Branch origem:** `${{ github.ref_name }}`
+            **Evento:** Push em feature branch
+
+            ---
+
+            _PR automático - não feche manualmente se ainda estiver trabalhando._
+
+          labels: automated, feature
+
+          draft: false
+          delete-branch: false
+          add-paths: .
