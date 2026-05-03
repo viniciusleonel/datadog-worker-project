@@ -1,4 +1,4 @@
-package org.example.datadog.exceptions;
+package org.example.datadog.exception;
 
 public class QueueProcessingException extends RuntimeException {
 

@@ -3,14 +3,12 @@ spring:
     name: datadog-worker
   cloud:
     aws:
+      endpoint: http://localstack:4566
       region:
         static: us-east-1
       credentials:
         access-key: test
         secret-key: test
       sqs:
-        endpoint: http://localstack:4566
-
-aws:
-  region: us-east-1
-  endpoint: http://localstack:4566
+        queue1: http://localstack:4566/000000000000/worker-queue-1
+        queue2: http://localstack:4566/000000000000/worker-queue-2
